@@ -1,0 +1,26 @@
+#!/bin/env bash
+exec 3>&1 4>&2
+trap 'exec 2>&4 1>&3' 0 1 2 3
+exec 1>>~/.local/share/qtile/display-script.log 2>&1
+
+
+displays=`xrandr | grep -e '\bconnected' | cut -d ' ' -f1 | tr '\n' ' '` 
+
+IFS=' ' read -r -a array <<< "$displays"
+
+olddis="${array[0]}"
+
+array=${array[@]:1}
+
+echo "array= ${array[@]}"
+echo "olddis= $olddis"
+echo "displays= $displays"
+
+for dis in $array
+do
+    xrandr --output $dis --auto --right-of $olddis
+    olddis=$dis
+done
+
+
+
